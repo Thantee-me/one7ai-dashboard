@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One7AI — Discovery Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --night:#070D1A; --panel:#0E1830; --panel2:#111E3C; --line:rgba(148,178,224,.14);
+  --txt:#E6EDF7; --muted:#8CA0BE; --aqua:#22D3EE; --blue:#3B82F6; --violet:#A78BFA;
+  --green:#34D399; --amber:#FBBF24; --red:#F87171;
+  --grad:linear-gradient(135deg,#06B6D4 0%,#2563EB 55%,#7C3AED 120%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:
+  radial-gradient(900px 400px at 90% -10%, rgba(124,58,237,.14), transparent 60%),
+  radial-gradient(800px 400px at 0% 0%, rgba(6,182,212,.10), transparent 60%),
+  var(--night);
+  color:var(--txt);min-height:100vh;line-height:1.6}
+h1,h2,h3{font-family:'Kanit',sans-serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+header{padding:26px 28px 8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo-mark{width:40px;height:40px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;
+  font-family:'Kanit',sans-serif;font-weight:700;font-size:1.15rem;color:#fff;box-shadow:0 8px 24px rgba(37,99,235,.45)}
+.htitle h1{font-size:1.2rem;font-weight:600}
+.htitle p{font-size:.76rem;color:var(--muted)}
+.hspace{flex:1}
+.btn{font-family:'Kanit',sans-serif;font-size:.85rem;border:none;border-radius:10px;cursor:pointer;
+  padding:9px 18px;background:var(--grad);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,.35);transition:all .15s}
+.btn:hover{transform:translateY(-1px)}
+.stamp{font-size:.72rem;color:var(--muted)}
+
+main{padding:16px 28px 60px;max-width:1400px;margin:0 auto}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:14px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+  border-radius:16px;padding:18px 20px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);opacity:.6}
+.kpi .lab{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:7px}
+.kpi .val{font-family:'Kanit',sans-serif;font-size:2rem;font-weight:600;margin-top:2px}
+.kpi .sub{font-size:.7rem;color:var(--muted)}
+.kpi .dot{width:8px;height:8px;border-radius:50%}
+
+.charts{grid-template-columns:repeat(auto-fit,minmax(330px,1fr));margin-bottom:14px}
+.chart-card h3{font-size:.92rem;font-weight:500;margin-bottom:12px;color:#C9D6EA;display:flex;gap:8px;align-items:center}
+.chart-card h3::before{content:'';width:12px;height:2px;background:var(--aqua);border-radius:2px}
+.chart-wrap{position:relative;height:230px}
+
+.table-card{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:900px}
+th{font-family:'Kanit',sans-serif;font-weight:500;font-size:.76rem;color:var(--muted);text-align:left;
+  padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid rgba(148,178,224,.07);vertical-align:top}
+tr:hover td{background:rgba(59,130,246,.05)}
+.co{font-weight:600;color:#fff}
+.sub2{font-size:.72rem;color:var(--muted)}
+.badge{display:inline-block;font-size:.66rem;font-weight:600;border-radius:999px;padding:2px 9px;margin:1px 3px 1px 0;white-space:nowrap}
+.b-hi{background:rgba(52,211,153,.16);color:var(--green);border:1px solid rgba(52,211,153,.35)}
+.b-bud{background:rgba(34,211,238,.13);color:var(--aqua);border:1px solid rgba(34,211,238,.32)}
+.b-pain{background:rgba(251,191,36,.13);color:var(--amber);border:1px solid rgba(251,191,36,.32)}
+.b-data{background:rgba(167,139,250,.14);color:var(--violet);border:1px solid rgba(167,139,250,.34)}
+.b-nur{background:rgba(140,160,190,.13);color:#AFC0DA;border:1px solid rgba(140,160,190,.3)}
+.b-red{background:rgba(248,113,113,.13);color:var(--red);border:1px solid rgba(248,113,113,.32)}
+
+.state{padding:60px 20px;text-align:center;color:var(--muted);font-size:.9rem}
+.state .big{font-size:2rem;margin-bottom:10px}
+.state code{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:.8rem}
+footer{text-align:center;color:#5E7191;font-size:.72rem;padding:0 20px 30px}
+@media(max-width:640px){header,main{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">7</div>
+  <div class="htitle">
+    <h1>Discovery Dashboard</h1>
+    <p>One7AI · Project Discovery Questionnaire — อ่านข้อมูลสดจาก Google Sheet</p>
+  </div>
+  <div class="hspace"></div>
+  <span class="stamp" id="stamp">—</span>
+  <button class="btn" onclick="loadData()">⟳ รีเฟรชข้อมูล</button>
+</header>
+
+<main>
+  <div id="loading" class="state"><div class="big">⏳</div>กำลังโหลดข้อมูลจาก Google Sheet...</div>
+  <div id="error" class="state" style="display:none"></div>
+
+  <div id="content" style="display:none">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="lab"><span class="dot" style="background:var(--blue)"></span>ผู้ตอบทั้งหมด</div><div class="val" id="kTotal">0</div><div class="sub">รายการใน Sheet</div></div>
+      <div class="card kpi"><div class="lab"><span class="dot" style="background:var(--aqua)"></span>7 วันล่าสุด</div><div class="val" id="kWeek">0</div><div class="sub">ผู้ตอบใหม่</div></div>
+      <div class="card kpi"><div class="lab"><span class="dot" style="background:var(--green)"></span>High Intent</div><div class="val" id="kHigh">0</div><div class="sub">พร้อมเริ่มเร็ว + ต้องการ Next Step</div></div>
+      <div class="card kpi"><div class="lab"><span class="dot" style="background:var(--amber)"></span>Budget Ready</div><div class="val" id="kBudget">0</div><div class="sub">กรอบงบ 500K ขึ้นไป</div></div>
+      <div class="card kpi"><div class="lab"><span class="dot" style="background:var(--red)"></span>Red Flag</div><div class="val" id="kRed">0</div><div class="sub">ขอข้อมูลแต่ไม่มีงบ/Timeline</div></div>
+    </div>
+
+    <div class="grid charts">
+      <div class="card chart-card"><h3>งบประมาณ</h3><div class="chart-wrap"><canvas id="cBudget"></canvas></div></div>
+      <div class="card chart-card"><h3>ระยะเวลาเริ่มโครงการ</h3><div class="chart-wrap"><canvas id="cTimeline"></canvas></div></div>
+      <div class="card chart-card"><h3>ประเภท & ขนาดองค์กร</h3><div class="chart-wrap"><canvas id="cOrg"></canvas></div></div>
+      <div class="card chart-card"><h3>ปัญหาที่พบบ่อยที่สุด (Top 8)</h3><div class="chart-wrap"><canvas id="cProblems"></canvas></div></div>
+      <div class="card chart-card"><h3>สิ่งที่อยากให้ AI ช่วย (Top 8)</h3><div class="chart-wrap"><canvas id="cAI"></canvas></div></div>
+      <div class="card chart-card"><h3>ขั้นตอนถัดไปที่ลูกค้าต้องการ</h3><div class="chart-wrap"><canvas id="cNext"></canvas></div></div>
+    </div>
+
+    <div class="card table-card">
+      <h3 style="font-size:.95rem;font-weight:500;margin-bottom:12px;color:#C9D6EA">รายการลูกค้า (Lead) พร้อมสัญญาณ</h3>
+      <table>
+        <thead><tr>
+          <th>เวลา</th><th>บริษัท / ผู้ตอบ</th><th>บทบาท</th><th>งบประมาณ</th><th>Timeline</th><th>สัญญาณ</th><th>Next Step ที่ขอ</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>One7AI Discovery Dashboard · ข้อมูลอัปเดตอัตโนมัติทุกครั้งที่เปิดหน้าหรือกดรีเฟรช · เกณฑ์สัญญาณอ้างอิงภาคผนวกภายในทีม</footer>
+
+<script>
+/* ================= ตั้งค่า ================= */
+const SHEET_ID = "1EXhMgkQXxdkgybvJhDDICFTQeigk2NLol6eegcXuKR0";
+const SHEET_NAME = "Responses";
+/* Sheet ต้องตั้งแชร์: ทุกคนที่มีลิงก์ = ผู้มีสิทธิ์อ่าน (Viewer) */
+
+const COLS = ['timestamp','company','contact_name','contact_phone','contact_email',
+'org_type','org_type_note','org_size','respondent_role',
+'project_goals','project_goals_note','current_problems','current_problems_note',
+'problem_impact','problem_impact_note','problem_frequency',
+'repetitive_tasks','repetitive_tasks_note','current_workflow','current_workflow_note',
+'systems_in_use','data_readiness','constraints','constraints_note',
+'ai_help','ai_help_note','system_must_not','system_must_not_note',
+'priority','priority_note','budget','timeline','next_steps','next_steps_note'];
+
+let charts = {};
+
+function splitMulti(v){
+  if(!v) return [];
+  return v.split(', ').map(function(s){return s.trim();}).filter(Boolean);
+}
+function count(rows, key, multi){
+  const m = {};
+  rows.forEach(function(r){
+    const v = r[key]; if(!v) return;
+    (multi ? splitMulti(v) : [v]).forEach(function(x){
+      if(x.indexOf('อื่นๆ') === 0) x = 'อื่น ๆ';
+      m[x] = (m[x]||0)+1;
+    });
+  });
+  return m;
+}
+function topN(m, n){
+  return Object.entries(m).sort(function(a,b){return b[1]-a[1];}).slice(0,n);
+}
+function shortLabel(s, len){
+  return s.length > len ? s.slice(0,len-1)+'…' : s;
+}
+
+/* ---- เกณฑ์สัญญาณ (ตามภาคผนวกทีม One7AI) ---- */
+function signals(r){
+  const s = [];
+  const tl = r.timeline||'', bd = r.budget||'', ns = r.next_steps||'', fq = r.problem_frequency||'';
+  const im = r.problem_impact||'', dr = r.data_readiness||'';
+  const fastStart = tl.indexOf('ทันที')!==-1 || tl.indexOf('ภายใน 1 เดือน')!==-1;
+  const wantsAction = ['Requirement','Workshop','POC','Proposal','Use Case','Demo'].some(function(k){return ns.indexOf(k)!==-1;});
+  const budgetReady = ['500,000','1 ล้าน','3 ล้าน','5 ล้าน'].some(function(k){return bd.indexOf(k)!==-1;}) && bd.indexOf('ยังไม่มีงบ')===-1;
+  const painStrong = (fq.indexOf('ทุกวัน')!==-1 || fq.indexOf('ทุกสัปดาห์')!==-1) &&
+    ['เวลา','ต้นทุน','รายได้','SLA','ลูกค้า'].some(function(k){return im.indexOf(k)!==-1;});
+  const dataReady = dr.indexOf('มีข้อมูลพร้อม')!==-1;
+  const studying = tl.indexOf('ศึกษา')!==-1 || tl.indexOf('ขึ้นอยู่กับ')!==-1;
+  const noBudget = bd.indexOf('ยังไม่มีงบ')!==-1 || !bd;
+  const askInfoOnly = ns.indexOf('ขอข้อมูลเพิ่มเติม')!==-1 && !wantsAction;
+
+  if(fastStart && wantsAction) s.push(['High Intent','b-hi']);
+  if(budgetReady) s.push(['Budget Ready','b-bud']);
+  if(painStrong) s.push(['Pain Strong','b-pain']);
+  if(dataReady) s.push(['Data Ready','b-data']);
+  if(askInfoOnly && noBudget && studying) s.push(['Red Flag','b-red']);
+  else if(s.length===0) s.push(['Nurture','b-nur']);
+  return s;
+}
+
+function parseGviz(text){
+  const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}')+1));
+  const rows = [];
+  (json.table.rows||[]).forEach(function(tr){
+    const r = {};
+    COLS.forEach(function(key,i){
+      const c = tr.c[i];
+      r[key] = c ? (c.f!=null ? String(c.f) : (c.v!=null ? String(c.v) : '')) : '';
+    });
+    if(r.timestamp || r.company) rows.push(r);
+  });
+  return rows;
+}
+
+function makeChart(id, type, labels, data, opts){
+  if(charts[id]) charts[id].destroy();
+  const palette = ['#22D3EE','#3B82F6','#A78BFA','#34D399','#FBBF24','#F87171','#F0ABFC','#7DD3FC','#86EFAC','#FDE68A'];
+  const horizontal = opts && opts.horizontal;
+  charts[id] = new Chart(document.getElementById(id), {
+    type: type,
+    data: { labels: labels, datasets: [{ data: data,
+      backgroundColor: type==='doughnut' ? palette : 'rgba(59,130,246,.55)',
+      borderColor: type==='doughnut' ? '#0E1830' : '#3B82F6',
+      borderWidth: type==='doughnut' ? 2 : 1.5, borderRadius: 6 }]},
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: type==='doughnut',
+        position:'right', labels:{ color:'#AFC0DA', font:{family:"'IBM Plex Sans Thai'",size:11}, boxWidth:12 } } },
+      scales: type==='doughnut' ? {} : {
+        x:{ ticks:{color:'#8CA0BE',font:{family:"'IBM Plex Sans Thai'",size:10},precision:0}, grid:{color:'rgba(148,178,224,.08)'} },
+        y:{ ticks:{color:'#AFC0DA',font:{family:"'IBM Plex Sans Thai'",size:10.5},precision:0}, grid:{color:'rgba(148,178,224,.08)'} }
+      }
+    }
+  });
+}
+
+function parseThaiDate(ts){
+  /* รูปแบบ toLocaleString('th-TH') เช่น 8/7/2569 15:22:30 */
+  try{
+    const m = ts.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(!m) return null;
+    let y = parseInt(m[3]); if(y > 2400) y -= 543;
+    return new Date(y, parseInt(m[2])-1, parseInt(m[1]));
+  }catch(e){ return null; }
+}
+
+async function loadData(){
+  const L = document.getElementById('loading'), E = document.getElementById('error'), C = document.getElementById('content');
+  L.style.display='block'; E.style.display='none';
+  try{
+    const url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&headers=1&sheet='+encodeURIComponent(SHEET_NAME)+'&t='+Date.now();
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows = parseGviz(await res.text());
+
+    document.getElementById('kTotal').textContent = rows.length;
+    const now = new Date(), week = rows.filter(function(r){
+      const d = parseThaiDate(r.timestamp); return d && (now-d) < 7*864e5;
+    }).length;
+    document.getElementById('kWeek').textContent = week;
+
+    let hi=0, bud=0, red=0;
+    rows.forEach(function(r){
+      const sg = signals(r).map(function(x){return x[0];});
+      if(sg.indexOf('High Intent')!==-1) hi++;
+      if(sg.indexOf('Budget Ready')!==-1) bud++;
+      if(sg.indexOf('Red Flag')!==-1) red++;
+    });
+    document.getElementById('kHigh').textContent = hi;
+    document.getElementById('kBudget').textContent = bud;
+    document.getElementById('kRed').textContent = red;
+
+    const bC = count(rows,'budget',false);
+    makeChart('cBudget','bar', Object.keys(bC).map(function(s){return shortLabel(s,22);}), Object.values(bC), {horizontal:true});
+    const tC = count(rows,'timeline',false);
+    makeChart('cTimeline','doughnut', Object.keys(tC).map(function(s){return shortLabel(s,26);}), Object.values(tC));
+    const oC = count(rows,'org_type',false);
+    makeChart('cOrg','doughnut', Object.keys(oC).map(function(s){return shortLabel(s,26);}), Object.values(oC));
+    const pT = topN(count(rows,'current_problems',true),8);
+    makeChart('cProblems','bar', pT.map(function(x){return shortLabel(x[0],30);}), pT.map(function(x){return x[1];}), {horizontal:true});
+    const aT = topN(count(rows,'ai_help',true),8);
+    makeChart('cAI','bar', aT.map(function(x){return shortLabel(x[0],30);}), aT.map(function(x){return x[1];}), {horizontal:true});
+    const nT = topN(count(rows,'next_steps',true),9);
+    makeChart('cNext','bar', nT.map(function(x){return shortLabel(x[0],30);}), nT.map(function(x){return x[1];}), {horizontal:true});
+
+    const tb = document.getElementById('tbody');
+    tb.innerHTML = '';
+    rows.slice().reverse().forEach(function(r){
+      const tr = document.createElement('tr');
+      const sg = signals(r).map(function(x){return '<span class="badge '+x[1]+'">'+x[0]+'</span>';}).join('');
+      tr.innerHTML =
+        '<td class="sub2">'+ (r.timestamp||'—') +'</td>'+
+        '<td><div class="co">'+ esc(r.company||'—') +'</div><div class="sub2">'+ esc(r.contact_name||'') + (r.contact_email?' · '+esc(r.contact_email):'') +'</div></td>'+
+        '<td class="sub2">'+ esc(shortLabel(r.respondent_role||'—',26)) +'</td>'+
+        '<td class="sub2">'+ esc(shortLabel(r.budget||'—',24)) +'</td>'+
+        '<td class="sub2">'+ esc(shortLabel(r.timeline||'—',24)) +'</td>'+
+        '<td>'+ sg +'</td>'+
+        '<td class="sub2">'+ esc(shortLabel(r.next_steps||'—',48)) +'</td>';
+      tb.appendChild(tr);
+    });
+
+    document.getElementById('stamp').textContent = 'อัปเดตล่าสุด: ' + new Date().toLocaleString('th-TH');
+    L.style.display='none'; C.style.display='block';
+  }catch(err){
+    L.style.display='none'; C.style.display='none';
+    E.style.display='block';
+    E.innerHTML = '<div class="big">⚠️</div>โหลดข้อมูลไม่สำเร็จ — สาเหตุที่พบบ่อยที่สุดคือ Sheet ยังไม่ได้เปิดแชร์<br><br>'+
+      'วิธีแก้: เปิด Google Sheet → ปุ่ม <b>แชร์</b> มุมขวาบน → เปลี่ยน "การเข้าถึงทั่วไป" เป็น <b>ทุกคนที่มีลิงก์ = ผู้มีสิทธิ์อ่าน (Viewer)</b> แล้วกดรีเฟรชหน้านี้ใหม่<br><br>'+
+      '<span class="sub2">รายละเอียดข้อผิดพลาด: <code>'+esc(err.message)+'</code></span>';
+  }
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+loadData();
+</script>
+</body>
+</html>
